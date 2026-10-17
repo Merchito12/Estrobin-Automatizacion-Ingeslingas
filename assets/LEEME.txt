@@ -1,0 +1,7 @@
+Coloca aquí las imágenes oficiales SIN modificar, con estos nombres exactos:
+
+  logo-ingeslingas.png      (logo de INGESLINGAS S.A.S.)
+  mascota-ingeslingas.png   (mascota oficial)
+
+El sitio las carga con rutas relativas: ./assets/logo-ingeslingas.png y ./assets/mascota-ingeslingas.png
+Si falta el logo se muestra el nombre de la empresa en texto; si falta la mascota, el bloque se oculta.

@@ -1,0 +1,22 @@
+# Blueprint de Render para el backend (carpeta backend/).
+# Tras crear el servicio, define ALLOWED_ORIGINS con el origen exacto de GitHub Pages
+# (solo esquema + dominio, sin ruta ni "/" final). Ejemplo: https://tu-usuario.github.io
+services:
+  - type: web
+    name: ingeslingas-portal-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    plan: free
+    region: virginia
+    envVars:
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: JOB_TTL_MINUTES
+        value: "30"
+      - key: MAX_UPLOAD_MB
+        value: "25"
+      - key: LOG_LEVEL
+        value: INFO

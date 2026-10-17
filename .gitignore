@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.env
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Datos reales de clientes: nunca se versionan
+/*.xls
+/*.xlsx
+/*.csv
+/uploads/
+backend/tests/fixtures/*
+!backend/tests/fixtures/README.md

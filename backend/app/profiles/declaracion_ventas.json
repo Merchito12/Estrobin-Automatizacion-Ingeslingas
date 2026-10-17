@@ -1,0 +1,110 @@
+{
+  "id": "declaracion_ventas",
+  "label": "Declaración de ventas",
+  "template": "PlantillaDeclaracionVentas_BASE.xlsx",
+  "sheet": "Declaración de ventas",
+  "auxiliary_sheets": ["Página de ayuda", "País", "Tipo documento", "Plazos"],
+  "header_row": 1,
+  "first_data_row": 2,
+  "style_prototype_row": 2,
+  "style_columns": 21,
+  "output_name_prefix": "PlantillaDeclaracionVentas",
+  "fallback_output_name": "PlantillaDeclaracionVentas CORREGIDA.xlsx",
+  "constants": {
+    "document_type": "nitco",
+    "country": "co",
+    "term_days": 90
+  },
+  "rules": {
+    "due_offset_days": 90,
+    "negative_amount_severity": "error",
+    "zero_amount_severity": "warning",
+    "header_scan_rows": 30,
+    "min_required_in_header": 3,
+    "alias_accept_threshold": 0.85,
+    "content_accept_threshold": 0.7,
+    "preview_rows": 15,
+    "max_issues_returned": 100
+  },
+  "columns": [
+    {
+      "key": "solunion_code", "letter": "A", "header": "COD. \nSOLUNION", "type": "text",
+      "role": "optional", "required": false,
+      "aliases": ["Cod. Solunion", "Id. Solunion", "Id Solunion", "Código Solunion", "Codigo Solunion"]
+    },
+    {
+      "key": "document_type", "letter": "B", "header": "TIPO DOCUMENTO ", "type": "text",
+      "role": "constant", "required": true, "constant": "nitco",
+      "aliases": []
+    },
+    {
+      "key": "nit", "letter": "C", "header": "CÓDIGO DOCUMENTO ", "type": "text",
+      "role": "source", "required": true,
+      "assume_dv_headers": ["codigo documento"],
+      "aliases": [
+        "NIT", "Nit", "N.I.T", "Identificación", "Identificacion", "Código tercero", "Codigo tercero",
+        "NIT cliente", "NIT tercero", "Número identificación", "Numero identificacion",
+        "Beneficiario Identidad", "Identidad beneficiario", "Nit beneficiario", "Cédula/NIT", "Cedula NIT",
+        "Número de documento", "Numero de documento", "Nro documento", "No documento", "Documento identidad",
+        "Código documento", "Codigo documento"
+      ]
+    },
+    {
+      "key": "name", "letter": "D", "header": "NOMBRE / RAZÓN SOCIAL", "type": "text",
+      "role": "source", "required": true,
+      "aliases": [
+        "Nombre", "Cliente", "Razón social", "Razon social", "Nombre cliente", "Nombre tercero", "Tercero",
+        "Beneficiario Nombre", "Nombre beneficiario", "Beneficiario", "Nombre o razón social", "Nombre / Razón social"
+      ]
+    },
+    {
+      "key": "country", "letter": "E", "header": "PAÍS", "type": "text",
+      "role": "constant", "required": true, "constant": "co",
+      "aliases": []
+    },
+    {
+      "key": "invoice", "letter": "F", "header": "NÚMERO FACTURA", "type": "text",
+      "role": "source", "required": true,
+      "aliases": [
+        "Factura", "Número factura", "Numero factura", "Nro factura", "No factura", "N° factura", "Número de factura",
+        "Numero de factura", "Documento factura", "Doc. Fuente", "Doc fuente", "Documento fuente", "Nro documento fuente"
+      ]
+    },
+    {
+      "key": "issue_date", "letter": "G", "header": "FECHA EMISIÓN", "type": "date",
+      "role": "source", "required": true,
+      "aliases": [
+        "Fecha", "Fecha factura", "Fecha emisión", "Fecha emision", "Fecha de emisión", "Fecha de emision",
+        "Fecha documento", "Fecha elaboración", "Fecha elaboracion", "Fecha de factura", "Fecha doc"
+      ]
+    },
+    {
+      "key": "due_date", "letter": "H", "header": "FECHA VENCIMIENTO", "type": "date",
+      "role": "derived", "required": false,
+      "aliases": ["Vencimiento", "Fecha vencimiento", "Fecha de vencimiento", "Fecha vcto", "Vcto"]
+    },
+    {
+      "key": "term", "letter": "I", "header": "PLAZO DE VENTA", "type": "int",
+      "role": "derived", "required": false, "constant": 90,
+      "aliases": ["Plazo", "Plazo venta", "Plazo de venta", "Días plazo", "Dias plazo", "Días de plazo", "Dias de plazo"]
+    },
+    {
+      "key": "amount", "letter": "J", "header": "VALOR DE LA FACTURA", "type": "decimal",
+      "role": "source", "required": true,
+      "aliases": [
+        "Vr Neto", "Vr. Neto", "Valor Neto", "Neto", "Total Neto", "Valor Factura", "Valor de la factura",
+        "Total factura", "Valor total factura", "Valor"
+      ]
+    },
+    {
+      "key": "debtor_reference", "letter": "K", "header": "REFERENCIA DEL DEUDOR", "type": "text",
+      "role": "optional", "required": false,
+      "aliases": ["Referencia del deudor", "Referencia deudor"]
+    },
+    {
+      "key": "payment_condition", "letter": "L", "header": "CONDICIÓN DE PAGO", "type": "text",
+      "role": "optional", "required": false,
+      "aliases": ["Condición de pago", "Condicion de pago", "Condición pago"]
+    }
+  ]
+}
