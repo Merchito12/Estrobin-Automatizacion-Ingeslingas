@@ -211,6 +211,7 @@ def map_columns(sheet: SourceSheet, header_index: int, profile: Profile) -> Mapp
         )
         used_cols.add(idx)
 
+    _reject_issue_date_without_dates(sheet, result, used_cols)
     _infer_issue_date_by_content(sheet, result, profile, used_cols)
 
     result.missing_required = [
@@ -219,6 +220,35 @@ def map_columns(sheet: SourceSheet, header_index: int, profile: Profile) -> Mapp
         if key not in result.matches
     ]
     return result
+
+
+def _plausible_date_cell(value: Any) -> bool:
+    """Fecha explícita o serial de Excel plausible (años ~1982-2064)."""
+    if looks_like_date_text(value):
+        return True
+    return (isinstance(value, (int, float)) and not isinstance(value, bool)
+            and 30000 <= float(value) <= 60000)
+
+
+def _reject_issue_date_without_dates(sheet: SourceSheet, result: MappingResult, used_cols: set[int]) -> None:
+    """Descarta la columna de fecha elegida por encabezado si su contenido no son fechas.
+
+    Caso real: HELISA deja el encabezado "Fecha" sobre la columna marcadora ("+") y las
+    fechas quedan en la columna siguiente, sin título. Así se libera la columna para que
+    la inferencia por contenido encuentre la correcta.
+    """
+    match = result.matches.get("issue_date")
+    if match is None or match.method == "contenido":
+        return
+    body = sheet.rows[result.header_index + 1: result.header_index + 1 + CONTENT_SAMPLE_ROWS]
+    values = [row[match.source_index] for row in body
+              if match.source_index < len(row) and not is_blank(row[match.source_index])]
+    if not values:
+        return
+    valid = sum(1 for v in values if _plausible_date_cell(v))
+    if valid / len(values) < 0.5:
+        del result.matches["issue_date"]
+        used_cols.discard(match.source_index)
 
 
 def _infer_issue_date_by_content(

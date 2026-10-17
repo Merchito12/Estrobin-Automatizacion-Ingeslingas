@@ -148,3 +148,18 @@ def test_errors_are_capped_in_the_response(store, profile):
 
 def test_helisa_header_constant_is_what_the_fixture_expects():
     assert HELISA_HEADER[2] == "Doc. Fuente"
+
+
+def test_fecha_header_over_marker_column_uses_dates_column(store, profile):
+    """HELISA (oct/2026): el encabezado 'Fecha' queda sobre la columna '+' y las fechas
+    están en la columna siguiente, sin título."""
+    rows = helisa_rows(5, month=9)
+    rows[0] = ["Fecha"] + list(rows[0][1:])
+    result = run(make_xlsx(rows, "Consulta"), store, profile)
+    assert result.ok, result.payload.get("errors")
+    payload = result.payload
+    assert payload["recordsFound"] == payload["validRecords"] == 5
+    assert payload["errors"] == []
+    assert payload["summary"]["minDate"] == "01/09/2026"
+    date_map = next(m for m in payload["mapping"] if m["target"] == "FECHA EMISIÓN")
+    assert date_map["source"] == "(sin encabezado)"
