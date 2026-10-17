@@ -14,7 +14,7 @@ Herramienta interna para preparar y validar el archivo Excel de **declaración d
 3. Extrae las facturas, aplica las reglas de la declaración y valida los datos.
 4. **Construye un libro nuevo** sobre `backend/templates/PlantillaDeclaracionVentas_BASE.xlsx`. Nunca corrige el archivo malo ni usa `DataFrame.to_excel`.
 5. Reabre el archivo generado y lo verifica (hojas, encabezados, tipos, formatos, columnas ocultas, total).
-6. Muestra vista previa y entrega la descarga. El archivo temporal se elimina al terminar la descarga o a los 30 minutos.
+6. Muestra una lista de **cambios realizados** (NIT, fechas, valores, filas omitidas), la vista previa y la descarga del Excel corregido. El archivo temporal se elimina al terminar la descarga o a los 30 minutos.
 
 Si algo no se puede corregir con seguridad, **no se genera archivo** y se indica fila y motivo.
 
@@ -223,4 +223,4 @@ Decisiones que conviene conocer:
 | «No se encontró ninguna hoja con encabezados reconocibles» | El archivo no tiene NIT, cliente, factura, fecha y valor | Revisar el archivo; añadir alias si el nombre es nuevo |
 | El archivo ya expiró | Pasaron más de 30 minutos o ya se descargó | Procesar de nuevo |
 | Funciona en local pero no con `file://` | CORS con origen `null` | Usar `python3 -m http.server 5500` |
-| Logo o mascota no aparecen | Nombres o ubicación distintos | Revisar `assets/` (nombres exactos, minúsculas) |
+| Logo o mascota no aparecen | Nombre o ubicación distintos. Caso frecuente en Mac: el archivo queda como `logo-ingeslingas.png..png` (doble extensión) | Revisar `assets/` con `ls assets`: nombres exactos y en minúsculas, una sola extensión. GitHub Pages distingue mayúsculas; el Mac no |

@@ -29,101 +29,102 @@
   </header>
 
   <main>
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="container hero__inner">
-        <div class="hero__copy">
-          <p class="kicker"><span class="kicker__mark" aria-hidden="true"></span>INGESLINGAS S.A.S.</p>
-          <h1 id="hero-title">Preparación y validación de archivos <span class="accent">para declaración de ventas</span></h1>
-          <p class="hero__lead">Carga un archivo generado desde HELISA o un Excel que haya sido rechazado por la plataforma. El sistema analiza la información, corrige los datos requeridos y genera un nuevo archivo bajo la estructura oficial validada.</p>
+    <h1 class="visually-hidden">Preparación y validación de archivos para declaración de ventas</h1>
 
-          <ul class="benefits">
-            <li class="benefit">
-              <svg class="benefit__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <div><strong>Validación automática</strong><span>Revisa NIT, fechas, valores y facturas duplicadas.</span></div>
-            </li>
-            <li class="benefit">
-              <svg class="benefit__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <div><strong>Plantilla controlada</strong><span>Siempre se reconstruye sobre la plantilla ya aceptada.</span></div>
-            </li>
-            <li class="benefit">
-              <svg class="benefit__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <div><strong>Procesamiento temporal</strong><span>El archivo se elimina del servidor después de la descarga.</span></div>
-            </li>
-          </ul>
-        </div>
+    <section class="start" id="procesar" aria-label="Cargar archivo">
+      <div class="container start__grid">
 
         <figure class="mascot">
+          <svg class="mascot__bg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <polygon class="shape shape--navy" points="0,44 0,74 31,74"/>
+            <polygon class="shape shape--red" points="0,74 62,74 88,88 0,88"/>
+            <polygon class="shape shape--navy" points="0,88 88,88 100,100 0,100"/>
+            <polygon class="shape shape--blue" points="80,88 88,88 84,92"/>
+          </svg>
+          <span class="mascot__diamond mascot__diamond--a" aria-hidden="true"></span>
+          <span class="mascot__diamond mascot__diamond--b" aria-hidden="true"></span>
+          <span class="mascot__diamond mascot__diamond--c" aria-hidden="true"></span>
+          <img class="mascot__img" src="./assets/mascota-ingeslingas.png" alt="Mascota oficial de INGESLINGAS S.A.S." data-fallback="">
           <figcaption class="mascot__tag">Seguridad · Control · Cumplimiento</figcaption>
-          <div class="mascot__stage">
-            <img class="mascot__img" src="./assets/mascota-ingeslingas.png" alt="Mascota oficial de INGESLINGAS S.A.S." data-fallback="">
-          </div>
-          <div class="hazard" aria-hidden="true"></div>
         </figure>
+
+        <div class="start__main">
+          <noscript><p class="notice notice--error">Este portal necesita JavaScript habilitado para procesar archivos.</p></noscript>
+          <div class="notice notice--warn" id="config-notice" hidden role="alert"></div>
+
+          <form class="card upload" id="upload-form" novalidate>
+            <ol class="steps" id="steps" aria-label="Progreso del proceso">
+              <li class="steps__item" data-step="upload" data-state="active"><span class="steps__num">1</span><span class="steps__label">Cargar</span></li>
+              <li class="steps__item" data-step="validate" data-state="idle"><span class="steps__num">2</span><span class="steps__label">Validar</span></li>
+              <li class="steps__item" data-step="download" data-state="idle"><span class="steps__num">3</span><span class="steps__label">Descargar</span></li>
+            </ol>
+
+            <div class="dropzone" id="dropzone">
+              <svg class="dropzone__icon" viewBox="0 0 48 48" aria-hidden="true">
+                <path d="M24 32V10m0 0l-8 8m8-8l8 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 30v6a4 4 0 004 4h24a4 4 0 004-4v-6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <p class="dropzone__title">Arrastra tu archivo aquí</p>
+              <p class="dropzone__sub" id="dropzone-hint">o selecciónalo directamente desde tu computador</p>
+              <button class="btn btn--secondary" type="button" id="pick-button" aria-describedby="dropzone-hint">Seleccionar archivo</button>
+              <p class="dropzone__formats">XLS · XLSX · CSV</p>
+              <input class="visually-hidden" type="file" id="file-input" accept=".xls,.xlsx,.csv" tabindex="-1" aria-label="Archivo de ventas (XLS, XLSX o CSV)">
+            </div>
+
+            <p class="field-error" id="file-error" role="alert" hidden></p>
+
+            <div class="file-chip" id="file-chip" hidden>
+              <span class="file-chip__type" id="file-type" aria-hidden="true">XLS</span>
+              <div class="file-chip__info">
+                <span class="file-chip__name" id="file-name"></span>
+                <span class="file-chip__meta" id="file-meta"></span>
+              </div>
+              <button class="icon-button" type="button" id="remove-file" aria-label="Quitar archivo seleccionado">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+
+            <div class="field">
+              <div class="field__label-row">
+                <label class="field__label" for="portal-error">Error reportado por la plataforma</label>
+                <span class="badge">Opcional</span>
+              </div>
+              <textarea id="portal-error" name="portal_error" rows="4" maxlength="4000" aria-describedby="portal-error-help" placeholder="Ejemplo: La fila 2 de la columna G está incorrecta, debe quedar en formato de fecha corta."></textarea>
+              <p class="field__help" id="portal-error-help">Si el archivo ya fue rechazado, copia aquí exactamente el mensaje mostrado por la plataforma. Esto ayuda al sistema a reforzar las validaciones necesarias.</p>
+            </div>
+
+            <div class="upload__actions">
+              <button class="btn btn--primary" type="submit" id="submit-button" disabled>
+                <span class="spinner" aria-hidden="true" hidden></span>
+                <span id="submit-label">Analizar y corregir archivo</span>
+              </button>
+            </div>
+            <p class="status-line" id="status-line" role="status" aria-live="polite" hidden></p>
+          </form>
+        </div>
+      </div>
+
+      <div class="container">
+        <div id="result" class="result-slot" tabindex="-1"></div>
       </div>
     </section>
 
-    <section class="process" id="procesar" aria-labelledby="process-title">
+    <section class="benefits-band" aria-label="Qué hace el portal">
       <div class="container">
-        <div class="process__head">
-          <div>
-            <h2 id="process-title">Cargar archivo</h2>
-            <p class="muted">Formatos permitidos: XLS, XLSX y CSV.</p>
-          </div>
-          <ol class="steps" id="steps" aria-label="Progreso del proceso">
-            <li class="steps__item" data-step="upload" data-state="active"><span class="steps__num">1</span><span class="steps__label">Cargar</span></li>
-            <li class="steps__item" data-step="validate" data-state="idle"><span class="steps__num">2</span><span class="steps__label">Validar</span></li>
-            <li class="steps__item" data-step="download" data-state="idle"><span class="steps__num">3</span><span class="steps__label">Descargar</span></li>
-          </ol>
-        </div>
-
-        <noscript><p class="notice notice--error">Este portal necesita JavaScript habilitado para procesar archivos.</p></noscript>
-        <div class="notice notice--warn" id="config-notice" hidden role="alert"></div>
-
-        <form class="card upload" id="upload-form" novalidate>
-          <div class="dropzone" id="dropzone">
-            <svg class="dropzone__icon" viewBox="0 0 48 48" aria-hidden="true">
-              <path d="M24 32V10m0 0l-8 8m8-8l8 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M8 30v6a4 4 0 004 4h24a4 4 0 004-4v-6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <p class="dropzone__title">Arrastra tu archivo aquí</p>
-            <p class="dropzone__sub" id="dropzone-hint">o selecciónalo directamente desde tu computador</p>
-            <button class="btn btn--secondary" type="button" id="pick-button" aria-describedby="dropzone-hint">Seleccionar archivo</button>
-            <p class="dropzone__formats">XLS · XLSX · CSV</p>
-            <input class="visually-hidden" type="file" id="file-input" accept=".xls,.xlsx,.csv" tabindex="-1" aria-label="Archivo de ventas (XLS, XLSX o CSV)">
-          </div>
-
-          <p class="field-error" id="file-error" role="alert" hidden></p>
-
-          <div class="file-chip" id="file-chip" hidden>
-            <span class="file-chip__type" id="file-type" aria-hidden="true">XLS</span>
-            <div class="file-chip__info">
-              <span class="file-chip__name" id="file-name"></span>
-              <span class="file-chip__meta" id="file-meta"></span>
-            </div>
-            <button class="icon-button" type="button" id="remove-file" aria-label="Quitar archivo seleccionado">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
-            </button>
-          </div>
-
-          <div class="field">
-            <div class="field__label-row">
-              <label class="field__label" for="portal-error">Error reportado por la plataforma</label>
-              <span class="badge">Opcional</span>
-            </div>
-            <textarea id="portal-error" name="portal_error" rows="4" maxlength="4000" aria-describedby="portal-error-help" placeholder="Ejemplo: La fila 2 de la columna G está incorrecta, debe quedar en formato de fecha corta."></textarea>
-            <p class="field__help" id="portal-error-help">Si el archivo ya fue rechazado, copia aquí exactamente el mensaje mostrado por la plataforma. Esto ayuda al sistema a reforzar las validaciones necesarias.</p>
-          </div>
-
-          <div class="upload__actions">
-            <button class="btn btn--primary" type="submit" id="submit-button" disabled>
-              <span class="spinner" aria-hidden="true" hidden></span>
-              <span id="submit-label">Analizar y corregir archivo</span>
-            </button>
-          </div>
-          <p class="status-line" id="status-line" role="status" aria-live="polite" hidden></p>
-        </form>
-
-        <div id="result" class="result-slot" tabindex="-1"></div>
+        <ul class="benefits">
+          <li class="benefit">
+            <svg class="benefit__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div><strong>Validación automática</strong><span>Revisa NIT, fechas, valores y facturas duplicadas.</span></div>
+          </li>
+          <li class="benefit">
+            <svg class="benefit__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div><strong>Plantilla controlada</strong><span>Siempre se reconstruye sobre la plantilla ya aceptada.</span></div>
+          </li>
+          <li class="benefit">
+            <svg class="benefit__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div><strong>Procesamiento temporal</strong><span>El archivo se elimina del servidor después de la descarga.</span></div>
+          </li>
+        </ul>
       </div>
     </section>
 

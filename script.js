@@ -208,6 +208,9 @@
     els.status.hidden = false;
     els.status.dataset.kind = kind;
     els.status.textContent = text;
+    if (kind === 'error') {
+      els.status.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'nearest' });
+    }
   }
 
   function clearStatus() {
@@ -341,6 +344,22 @@
     els.result.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
   }
 
+  function showLoading() {
+    const text = h('p', { class: 'loading__text', text: 'Esto puede tardar unos segundos. No cierres esta página.' });
+    const node = h('div', { class: 'card loading', role: 'status', 'aria-live': 'polite' },
+      h('div', { class: 'loading__ring', 'aria-hidden': 'true' }),
+      h('p', { class: 'loading__title', text: 'Analizando y corrigiendo el archivo…' }),
+      text,
+      h('div', { class: 'loading__bar', 'aria-hidden': 'true' }));
+    showResult(node);
+    return {
+      warm() {
+        text.textContent = MSG.warmingUp;
+        text.classList.add('loading__text--cold');
+      },
+    };
+  }
+
   function metric(label, value, sub) {
     return h('div', { class: 'metric' },
       h('span', { class: 'metric__label', text: label }),
@@ -440,6 +459,18 @@
         h('p', { class: 'result__text', text: text })));
   }
 
+  function changesBlock(changes) {
+    if (!changes || changes.length === 0) return null;
+    const items = changes.map((change) => h('li', { class: 'change' },
+      h('span', { class: 'change__mark' }, change.count != null ? fmtInt(change.count) : icon(ICON_OK)),
+      h('div', null,
+        h('span', { class: 'change__title', text: change.title }),
+        change.detail ? h('span', { class: 'change__detail', text: change.detail }) : null)));
+    return block('Cambios realizados al archivo',
+      h('p', { class: 'block__lead', text: 'Esto fue lo que se modificó respecto al archivo que cargaste. El número indica cuántas filas se vieron afectadas.' }),
+      h('ul', { class: 'changes' }, items));
+  }
+
   function renderSuccess(data) {
     const summary = data.summary || {};
     const stats = data.stats || {};
@@ -457,15 +488,18 @@
       resultHead('ok', 'ARCHIVO VALIDADO', 'El archivo final está listo',
         'Las validaciones obligatorias fueron completadas correctamente.'),
       metrics,
-      hintsBlock(data.portalErrorHints, 'Correcciones aplicadas'),
+      changesBlock(data.changes),
+      hintsBlock(data.portalErrorHints, 'Reglas reforzadas según el mensaje de la plataforma'),
       warnings.length > 0
         ? block('Advertencias (' + (data.warningCount || warnings.length) + ')',
           ...issueList(warnings, 'warn', data.warningCount || warnings.length, 10))
-        : null,
-      previewBlock(data.preview, data.recordsFound),
-      mappingBlock(data.mapping, false));
+        : null);
 
-    const root = h('div', { class: 'result result--ok' }, panel, downloadPanel(data),
+    const preview = previewBlock(data.preview, data.recordsFound);
+    const mapping = mappingBlock(data.mapping, false);
+    const extra = preview || mapping ? h('div', { class: 'card result__panel' }, preview, mapping) : null;
+
+    const root = h('div', { class: 'result result--ok' }, panel, downloadPanel(data), extra,
       h('div', { class: 'result__actions' },
         h('button', { class: 'btn btn--ghost', type: 'button', onclick: resetAll, text: 'Procesar otro archivo' })));
 
@@ -609,8 +643,9 @@
     clearStatus();
     setBusy(true);
     setSteps('done', 'active', 'idle');
+    const loading = showLoading();
 
-    const coldTimer = setTimeout(() => showStatus('info', MSG.warmingUp), COLD_NOTICE_MS);
+    const coldTimer = setTimeout(() => loading.warm(), COLD_NOTICE_MS);
     const controller = new AbortController();
     const killer = setTimeout(() => controller.abort(), PROCESS_TIMEOUT_MS);
 
@@ -627,17 +662,20 @@
         setBadge('ok', 'Sistema disponible');
         if (data.ok && data.jobId) renderSuccess(data);
         else if (!data.ok) renderFailure(data, response.status);
-        else { showStatus('error', MSG.unexpected(response.status)); stepsForIdle(); }
+        else { clearResult(); showStatus('error', MSG.unexpected(response.status)); stepsForIdle(); }
       } else if ([502, 503, 504].includes(response.status)) {
         setBadge('warn', 'Iniciando servicio…');
+        clearResult();
         showStatus('error', MSG.warmingUp + ' Intenta nuevamente en unos segundos.');
         stepsForIdle();
       } else {
+        clearResult();
         showStatus('error', MSG.unexpected(response.status));
         stepsForIdle();
       }
     } catch (error) {
       clearStatus();
+      clearResult();
       const aborted = error && error.name === 'AbortError';
       showStatus('error', aborted ? MSG.timeout : MSG.network);
       setBadge('error', 'Servicio no disponible');
@@ -663,7 +701,7 @@
       img.replaceWith(h('span', { class: 'img-missing', text: fallback }));
     } else {
       const figure = img.closest('figure');
-      const container = img.closest('.hero__inner');
+      const container = img.closest('.start__grid');
       if (figure) figure.hidden = true;
       if (container) container.classList.add('no-mascot');
     }

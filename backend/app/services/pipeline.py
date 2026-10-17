@@ -9,6 +9,7 @@ from typing import Any
 
 from ..models import ERROR, WARNING, Issue, Record
 from ..profile import Profile
+from . import changes as changes_service
 from . import error_interpreter, excel_writer, mapping, transformer, validator
 from .file_reader import FileReadError, read_source
 from .jobs import JobStore
@@ -197,6 +198,7 @@ def process_upload(data: bytes, extension: str, portal_error: str | None,
         "errorCount": 0,
         "mapping": mapping_rows,
         "portalErrorHints": hints,
+        "changes": changes_service.summarize_changes(records, extraction.stats, profile),
         "summary": {
             "totalValue": float(total),
             "totalValueText": format(total, "f"),
